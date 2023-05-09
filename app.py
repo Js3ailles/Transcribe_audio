@@ -112,6 +112,8 @@ st.sidebar.title("Test Section")
 # Upload a sample audio file for testing purposes
 test_audio_file = st.sidebar.file_uploader("Upload an audio file for testing", type=["mp3", "mp4", "wav"])
 
+temp_dir = None
+
 if test_audio_file is not None:
     st.sidebar.write("Sample Audio File:")
     st.sidebar.audio(test_audio_file)
@@ -130,7 +132,7 @@ if test_audio_file is not None:
         except Exception as e:
             st.sidebar.error(f"Error in split_audio: {e}")
 
-    if st.sidebar.button("Test transcribe_audio_files"):
+    if temp_dir is not None and st.sidebar.button("Test transcribe_audio_files"):
         try:
             responses = transcribe_audio_files(temp_dir.name)
             st.sidebar.write(f"Received {len(responses)} responses from the transcription API")
