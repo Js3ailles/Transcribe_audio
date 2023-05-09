@@ -98,8 +98,8 @@ if uploaded_files:
                     transcript = transcribe_audio(tmp_audio_file.name, 700)
                     st.write("voici le transcript")
                     st.session_state[f"transcript_{selected_audio}"] = transcript
-          except Exception as e:
-              st.error(f"Error during transcription process: {e}")
+        except Exception as e:
+            st.error(f"Error during transcription process: {e}")
 
     if st.session_state[f"transcript_{selected_audio}"] is not None:
         st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
