@@ -21,8 +21,8 @@ def split_audio(file_path, part_duration):
 
         return parts, temp_dir
     except Exception as e:
-        st.error(f"Error in split_audio: {e}")
-        raise e
+        print(f"Error in split_audio: {e}")
+        raise
 
 
 def transcribe_audio_files(directory):
@@ -32,9 +32,9 @@ def transcribe_audio_files(directory):
         'x-gladia-key': st.secrets["GLADIA_KEY"],
     }
 
-    try:
-        for filename in os.listdir(directory):
-            if filename.endswith(".mp3"):
+    for filename in os.listdir(directory):
+        if filename.endswith(".mp3"):
+            try:
                 file_path = os.path.join(directory, filename)
                 files = {
                     'audio': (filename, open(file_path, 'rb'), 'audio/mpeg'),
@@ -50,11 +50,10 @@ def transcribe_audio_files(directory):
                     responses.append(response)
                 else:
                     print(f"Request for {filename} failed with status code {response.status_code}: {response.text}")
+            except Exception as e:
+                print(f"Error in transcribe_audio_files for {filename}: {e}")
 
-        return responses
-    except Exception as e:
-        st.error(f"Error in transcribe_audio_files: {e}")
-        raise e
+    return responses
 
 
 def transcribe_audio(input_file_path, segment_duration):
@@ -73,8 +72,8 @@ def transcribe_audio(input_file_path, segment_duration):
 
         return transcript
     except Exception as e:
-        st.error(f"Error in transcribe_audio: {e}")
-        raise e
+        print(f"Error in transcribe_audio: {e}")
+        raise
 
 
 st.title("Audio Transcription App")
@@ -90,8 +89,8 @@ if uploaded_files:
     selected_audio = st.sidebar.selectbox("Select an audio file to view transcription", list(audio_files.keys()))
 
     if st.button("Transcribe"):
-        with st.spinner('Creating this audio transcript'):
-            try:
+        try:
+            with st.spinner('Creating this audio transcript'):
                 with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
                     tmp_audio_file.write(audio_files[selected_audio].getbuffer())
                     tmp_audio_file.flush()
