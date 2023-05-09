@@ -106,35 +106,42 @@ if uploaded_files:
     else:
         st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
         
+import shutil
+
 # Test section in the sidebar
 st.sidebar.title("Test Section")
 
 # Upload a sample audio file for testing purposes
 test_audio_file = st.sidebar.file_uploader("Upload an audio file for testing", type=["mp3", "mp4", "wav"])
 
-temp_dir = None
+test_audio_file_path = None
+test_split_directory = None
 
 if test_audio_file is not None:
     st.sidebar.write("Sample Audio File:")
     st.sidebar.audio(test_audio_file)
 
-    # Save the test audio file to a temporary file
-    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
-        tmp_audio_file.write(test_audio_file.getbuffer())
-        tmp_audio_file.flush()
-        test_audio_file_path = tmp_audio_file.name
+    # Save the test audio file to a permanent file
+    test_audio_file_path = f"test_audio_{test_audio_file.name}"
+    with open(test_audio_file_path, "wb") as f:
+        f.write(test_audio_file.getbuffer())
 
     # Add buttons to test individual functions
     if st.sidebar.button("Test split_audio"):
         try:
             parts, temp_dir = split_audio(test_audio_file_path, 700)
             st.sidebar.write(f"Sample audio split into {parts} parts")
+            test_split_directory = "test_split_directory"
+            os.makedirs(test_split_directory, exist_ok=True)
+            for file in os.listdir(temp_dir.name):
+                shutil.move(os.path.join(temp_dir.name, file), os.path.join(test_split_directory, file))
+            temp_dir.cleanup()
         except Exception as e:
             st.sidebar.error(f"Error in split_audio: {e}")
 
-    if temp_dir is not None and st.sidebar.button("Test transcribe_audio_files"):
+    if test_split_directory is not None and st.sidebar.button("Test transcribe_audio_files"):
         try:
-            responses = transcribe_audio_files(temp_dir.name)
+            responses = transcribe_audio_files(test_split_directory)
             st.sidebar.write(f"Received {len(responses)} responses from the transcription API")
         except Exception as e:
             st.sidebar.error(f"Error in transcribe_audio_files: {e}")
