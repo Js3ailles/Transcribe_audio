@@ -25,7 +25,7 @@ def transcribe_audio_files(directory):
     responses = []
     headers = {
         'accept': 'application/json',
-        'x-gladia-key': '4834ea18-9ff3-4642-b2ee-9ac269da92f6',
+        'x-gladia-key': os.getenv(gladia),
     }
 
     for filename in os.listdir(directory):
