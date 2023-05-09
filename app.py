@@ -81,7 +81,9 @@ if uploaded_files:
         with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
             tmp_audio_file.write(audio_files[selected_audio].getbuffer())
             tmp_audio_file.flush()
+            st.write("en cours de chargement")
             transcript = transcribe_audio(tmp_audio_file.name, 700)
+            st.write("voici le transcript")
 
             st.session_state[f"transcript_{selected_audio}"] = transcript
 
