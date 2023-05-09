@@ -105,3 +105,45 @@ if uploaded_files:
         st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
     else:
         st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
+        
+# Test section in the sidebar
+st.sidebar.title("Test Section")
+
+# Upload a sample audio file for testing purposes
+test_audio_file = st.sidebar.file_uploader("Upload an audio file for testing", type=["mp3", "mp4", "wav"])
+
+if test_audio_file is not None:
+    st.sidebar.write("Sample Audio File:")
+    st.sidebar.audio(test_audio_file)
+
+    # Save the test audio file to a temporary file
+    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
+        tmp_audio_file.write(test_audio_file.getbuffer())
+        tmp_audio_file.flush()
+        test_audio_file_path = tmp_audio_file.name
+
+    # Add buttons to test individual functions
+    if st.sidebar.button("Test split_audio"):
+        try:
+            parts, temp_dir = split_audio(test_audio_file_path, 700)
+            st.sidebar.write(f"Sample audio split into {parts} parts")
+        except Exception as e:
+            st.sidebar.error(f"Error in split_audio: {e}")
+
+    if st.sidebar.button("Test transcribe_audio_files"):
+        try:
+            responses = transcribe_audio_files(temp_dir.name)
+            st.sidebar.write(f"Received {len(responses)} responses from the transcription API")
+        except Exception as e:
+            st.sidebar.error(f"Error in transcribe_audio_files: {e}")
+
+    if st.sidebar.button("Test transcribe_audio"):
+        try:
+            transcript = transcribe_audio(test_audio_file_path, 700)
+            st.sidebar.write("Transcription result:")
+            st.sidebar.write(transcript)
+        except Exception as e:
+            st.sidebar.error(f"Error in transcribe_audio: {e}")
+else:
+    st.sidebar.warning("Please upload an audio file to test the functions.")
+
