@@ -145,11 +145,11 @@ if uploaded_files:
         except Exception as e:
             st.error(f"Error during transcription process: {e}")
 
-if st.session_state[f"transcript_{selected_audio}"] is not None:
-        st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
+    if st.session_state[f"transcript_{selected_audio}"] is not None:
+            st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
 
-        # Add a download link for the prediction file
-        if "prediction_file_path" in st.session_state:
-            st.markdown(f"[Download prediction file](file:///{st.session_state['prediction_file_path']})")
+            # Add a download link for the prediction file
+            if "prediction_file_path" in st.session_state:
+                st.markdown(f"[Download prediction file](file:///{st.session_state['prediction_file_path']})")
     else:
         st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
