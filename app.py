@@ -101,7 +101,7 @@ def transcribe_audio(input_file_path, segment_duration, file_type, update_callba
                     if 'prediction' in data:
                         prediction = data['prediction']
                         predictions.append(prediction)
-                        predicted += f'\nVoici la traduction de la partie {idx}\n{prediction}'
+                        predicted += f'\n\n{prediction}'
 
                         if update_callback:
                             update_callback(predicted)
