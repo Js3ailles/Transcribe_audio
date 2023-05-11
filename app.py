@@ -60,7 +60,7 @@ def transcribe_audio_files(directory, max_workers=5):
     responses = {}
     headers = {
         'accept': 'application/json',
-        'x-gladia-key': '4834ea18-9ff3-4642-b2ee-9ac269da92f6',
+        'x-gladia-key': st.secrets["GLADIA_KEY"],
     }
 
     sorted_files = sorted(os.listdir(directory))
