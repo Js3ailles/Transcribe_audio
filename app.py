@@ -158,10 +158,9 @@ if uploaded_files:
 
             # Add a download link for the prediction file
             if "prediction_file_path" in st.session_state:
-                st.markdown(f"[Download prediction file](file:///{st.session_state['prediction_file_path']})")
                 with open(st.session_state['prediction_file_path'], 'r') as prediction_file:
                     st.download_button(
-        label="Download prediction file",
+        label="Download transcription file",
         data=prediction_file,
         file_name=f"transcription_{selected_audio}.txt",
         mime="text/plain"
