@@ -128,21 +128,21 @@ if uploaded_files:
     selected_audio = st.sidebar.selectbox("Select an audio file to view transcription", list(audio_files.keys()))
 
     if st.button("Transcribe"):
-    try:
-        with st.spinner('Creating this audio transcript'):
-            with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
-                tmp_audio_file.write(audio_files[selected_audio].getbuffer())
-                tmp_audio_file.flush()
+        try:
+            with st.spinner('Creating this audio transcript'):
+                with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
+                    tmp_audio_file.write(audio_files[selected_audio].getbuffer())
+                    tmp_audio_file.flush()
 
-                def update_transcription(transcription):
-                    st.session_state[f"transcript_{selected_audio}"] = transcription
+                    def update_transcription(transcription):
+                        st.session_state[f"transcript_{selected_audio}"] = transcription
 
-                st.write("en cours de chargement")
-                transcript, prediction_file_path = transcribe_audio(tmp_audio_file.name, 700, update_callback=update_transcription)
-                st.write("voici le transcript")
+                    st.write("en cours de chargement")
+                    transcript, prediction_file_path = transcribe_audio(tmp_audio_file.name, 700, update_callback=update_transcription)
+                    st.write("voici le transcript")
 
-    except Exception as e:
-        st.error(f"Error during transcription process: {e}")
+        except Exception as e:
+            st.error(f"Error during transcription process: {e}")
 
 if st.session_state[f"transcript_{selected_audio}"] is not None:
     st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
