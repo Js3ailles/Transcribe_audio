@@ -16,6 +16,9 @@ import concurrent.futures
 
 
 def split_audio(file_path, output_dir, part_duration):
+    from moviepy.config import change_settings
+    change_settings({"FFMPEG_BINARY": "ffmpeg",
+                     "FFMPEG_INPUT_OPTIONS": "-analyzeduration 100M -probesize 100M"})
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
