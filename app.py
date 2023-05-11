@@ -79,10 +79,15 @@ def transcribe_audio_files(directory, max_workers=5):
     return [responses[filename] for filename in sorted_files if filename.endswith(".mp3")]
 
 
-def transcribe_audio(input_file_path, segment_duration, update_callback=None):
+def transcribe_audio(input_file_path, segment_duration, file_type, update_callback=None):
     predicted = ''
     temp_dir = Path("temp/splitted")
     temp_dir.mkdir(parents=True, exist_ok=True)
+
+    if file_type == "mp4":
+        video = AudioFileClip(input_file_path)
+        input_file_path = input_file_path.replace(".mp4", ".mp3")
+        video.audio.write_audiofile(input_file_path)
 
     num_parts = split_audio(input_file_path, temp_dir, segment_duration)
     resp = transcribe_audio_files(temp_dir)
@@ -116,6 +121,7 @@ def transcribe_audio(input_file_path, segment_duration, update_callback=None):
 
 
 
+
 st.title("Audio Transcription App")
 
 uploaded_files = st.file_uploader("Upload one or multiple audio files", type=["mp3", "mp4", "wav"], accept_multiple_files=True)
@@ -131,7 +137,7 @@ if uploaded_files:
     if st.button("Transcribe"):
         try:
             with st.spinner('Creating this audio transcript'):
-                with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
+                with NamedTemporaryFile(delete=False, suffix=f".{audio_files[selected_audio].type.split('/')[-1]}") as tmp_audio_file:
                     tmp_audio_file.write(audio_files[selected_audio].getbuffer())
                     tmp_audio_file.flush()
 
@@ -139,11 +145,12 @@ if uploaded_files:
                         st.session_state[f"transcript_{selected_audio}"] = transcription
 
                     st.write("en cours de chargement")
-                    transcript, prediction_file_path = transcribe_audio(tmp_audio_file.name, 700, update_callback=update_transcription)
+                    transcript, prediction_file_path = transcribe_audio(tmp_audio_file.name, 700, audio_files[selected_audio].type.split('/')[-1], update_callback=update_transcription)
                     st.write("voici le transcript")
 
         except Exception as e:
             st.error(f"Error during transcription process: {e}")
+
 
     if st.session_state[f"transcript_{selected_audio}"] is not None:
             st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
