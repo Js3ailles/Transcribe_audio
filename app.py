@@ -146,6 +146,7 @@ if uploaded_files:
 
                     st.write("en cours de chargement")
                     transcript, prediction_file_path = transcribe_audio(tmp_audio_file.name, 700, audio_files[selected_audio].type.split('/')[-1], update_callback=update_transcription)
+                    st.session_state['prediction_file_path'] = prediction_file_path  # Add this line
                     st.write("voici le transcript")
 
         except Exception as e:
@@ -158,5 +159,15 @@ if uploaded_files:
             # Add a download link for the prediction file
             if "prediction_file_path" in st.session_state:
                 st.markdown(f"[Download prediction file](file:///{st.session_state['prediction_file_path']})")
+                with open(st.session_state['prediction_file_path'], 'r') as prediction_file:
+                    st.download_button(
+        label="Download prediction file",
+        data=prediction_file,
+        file_name=f"transcription_{selected_audio}.txt",
+        mime="text/plain"
+    )
+
     else:
         st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
+        
+    
