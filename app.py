@@ -2,78 +2,117 @@ import os
 import requests
 from moviepy.editor import AudioFileClip
 from tempfile import TemporaryDirectory, NamedTemporaryFile
-import streamlit as st
+import streamlit as st  
+import shutil
 
 
-def split_audio(file_path, part_duration):
-    try:
-        audio = AudioFileClip(file_path)
-        duration = audio.duration
-        parts = int(duration // part_duration)
-
-        temp_dir = TemporaryDirectory()
-
-        for i in range(parts):
-            start_time = i * part_duration
-            end_time = (i + 1) * part_duration
-            split_audio = audio.subclip(start_time, end_time)
-            split_audio.write_audiofile(os.path.join(temp_dir.name, f"part_{i + 1}.mp3"), codec='mp3')
-
-        return parts, temp_dir
-    except Exception as e:
-        print(f"Error in split_audio: {e}")
-        raise
+import os
+import requests
+from moviepy.editor import AudioFileClip
+import time
+import shutil
+from pathlib import Path
+from tenacity import retry, stop_after_attempt, wait_fixed
+import concurrent.futures
 
 
-def transcribe_audio_files(directory):
-    responses = []
+def split_audio(file_path, output_dir, part_duration):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    audio = AudioFileClip(file_path)
+    duration = audio.duration
+    parts = int(duration // part_duration)
+
+    for i in range(parts):
+        start_time = i * part_duration
+        end_time = (i + 1) * part_duration
+        split_audio = audio.subclip(start_time, end_time)
+        split_audio.write_audiofile(os.path.join(output_dir, f"part_{i + 1:03d}.mp3"), codec='mp3')
+
+    print(f"Audio file successfully split into {parts} equal parts and saved in '{output_dir}'.")
+    return parts
+
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
+def transcribe_single_file(filename, directory, headers):
+    file_path = os.path.join(directory, filename)
+    with open(file_path, 'rb') as file:
+        files = {
+            'audio': (filename, file, 'audio/mpeg'),
+            'diarization_max_speakers': (None, '2'),
+            'language': (None, 'french'),
+            'language_behaviour': (None, 'manual'),
+            'output_format': (None, 'txt'),
+            'target_translation_language': (None, 'english'),
+        }
+
+        response = requests.post('https://api.gladia.io/audio/text/audio-transcription/', headers=headers, files=files)
+
+        if response.status_code != 200:
+            raise Exception(f"Request for {filename} failed with status code {response.status_code}: {response.text}")
+
+    return filename, response
+
+
+
+def transcribe_audio_files(directory, max_workers=5):
+    responses = {}
     headers = {
         'accept': 'application/json',
-        'x-gladia-key': st.secrets["GLADIA_KEY"],
+        'x-gladia-key': '4834ea18-9ff3-4642-b2ee-9ac269da92f6',
     }
 
-    for filename in os.listdir(directory):
-        if filename.endswith(".mp3"):
+    sorted_files = sorted(os.listdir(directory))
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(transcribe_single_file, filename, directory, headers): filename for filename in sorted_files if filename.endswith(".mp3")}
+        for future in concurrent.futures.as_completed(futures):
+            filename = futures[future]
             try:
-                file_path = os.path.join(directory, filename)
-                files = {
-                    'audio': (filename, open(file_path, 'rb'), 'audio/mpeg'),
-                    'diarization_max_speakers': (None, '2'),
-                    'language': (None, 'french'),
-                    'language_behaviour': (None, 'manual'),
-                    'output_format': (None, 'txt'),
-                    'target_translation_language': (None, 'english'),
-                }
-
-                response = requests.post('https://api.gladia.io/audio/text/audio-transcription/', headers=headers, files=files)
-                if response.status_code == 200:
-                    responses.append(response)
-                else:
-                    print(f"Request for {filename} failed with status code {response.status_code}: {response.text}")
+                response = future.result()
+                responses[filename] = response
             except Exception as e:
-                print(f"Error in transcribe_audio_files for {filename}: {e}")
+                print(f"Failed to transcribe {filename}: {e}")
 
-    return responses
+    return [responses[filename] for filename in sorted_files if filename.endswith(".mp3")]
 
 
-def transcribe_audio(input_file_path, segment_duration):
-    try:
-        num_parts, temp_dir = split_audio(input_file_path, segment_duration)
-        resp = transcribe_audio_files(temp_dir.name)
-        predictions = []
-        for response in resp:
-            data = response.json()
-            if 'prediction' in data:
-                predictions.append(data['prediction'])
+def transcribe_audio(input_file_path, segment_duration, update_callback=None):
+    predicted = ''
+    temp_dir = Path("temp/splitted")
+    temp_dir.mkdir(parents=True, exist_ok=True)
+
+    num_parts = split_audio(input_file_path, temp_dir, segment_duration)
+    resp = transcribe_audio_files(temp_dir)
+    predictions = []
+
+    with NamedTemporaryFile(delete=False, suffix=".txt") as tmp_prediction_file:
+        for idx, (filename, response) in enumerate(resp, start=1):
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    if 'prediction' in data:
+                        prediction = data['prediction']
+                        predictions.append(prediction)
+                        predicted += f'\nVoici la traduction de la partie {idx}\n{prediction}'
+
+                        if update_callback:
+                            update_callback(predicted)
+
+                        tmp_prediction_file.write((prediction + f'\nVoici la traduction de la partie {idx}\n').encode('utf-8'))
+                    else:
+                        print(f"Key 'prediction' not found in response from {response.url}")
+                except JSONDecodeError:
+                    print(f"Failed to parse JSON response for {filename}: {response.text}")
             else:
-                print(f"Key 'prediction' not found in response from {response.url}")
+                print(f"Request for {filename} failed with status code {response.status_code}: {response.text}")
 
-        transcript = "\n".join(predictions)
+    shutil.rmtree(temp_dir)
 
-        return transcript
-    except Exception as e:
-        print(f"Error in transcribe_audio: {e}")
-        raise
+    print("Predictions have been saved.")
+    return predicted, tmp_prediction_file.name
+
 
 
 st.title("Audio Transcription App")
@@ -89,70 +128,27 @@ if uploaded_files:
     selected_audio = st.sidebar.selectbox("Select an audio file to view transcription", list(audio_files.keys()))
 
     if st.button("Transcribe"):
-        try:
-            with st.spinner('Creating this audio transcript'):
-                with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
-                    tmp_audio_file.write(audio_files[selected_audio].getbuffer())
-                    tmp_audio_file.flush()
-                    st.write("en cours de chargement")
-                    transcript = transcribe_audio(tmp_audio_file.name, 700)
-                    st.write("voici le transcript")
-                    st.session_state[f"transcript_{selected_audio}"] = transcript
-        except Exception as e:
-            st.error(f"Error during transcription process: {e}")
+    try:
+        with st.spinner('Creating this audio transcript'):
+            with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
+                tmp_audio_file.write(audio_files[selected_audio].getbuffer())
+                tmp_audio_file.flush()
 
-    if st.session_state[f"transcript_{selected_audio}"] is not None:
-        st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
-    else:
-        st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
-        
-import shutil
+                def update_transcription(transcription):
+                    st.session_state[f"transcript_{selected_audio}"] = transcription
 
-# Test section in the sidebar
-st.sidebar.title("Test Section")
+                st.write("en cours de chargement")
+                transcript, prediction_file_path = transcribe_audio(tmp_audio_file.name, 700, update_callback=update_transcription)
+                st.write("voici le transcript")
 
-# Upload a sample audio file for testing purposes
-test_audio_file = st.sidebar.file_uploader("Upload an audio file for testing", type=["mp3", "mp4", "wav"])
+    except Exception as e:
+        st.error(f"Error during transcription process: {e}")
 
-test_audio_file_path = None
-test_split_directory = None
+if st.session_state[f"transcript_{selected_audio}"] is not None:
+    st.text_area("Transcription", value=st.session_state[f"transcript_{selected_audio}"], height=400)
 
-if test_audio_file is not None:
-    st.sidebar.write("Sample Audio File:")
-    st.sidebar.audio(test_audio_file)
-
-    # Save the test audio file to a permanent file
-    test_audio_file_path = f"test_audio_{test_audio_file.name}"
-    with open(test_audio_file_path, "wb") as f:
-        f.write(test_audio_file.getbuffer())
-
-    # Add buttons to test individual functions
-    if st.sidebar.button("Test split_audio"):
-        try:
-            parts, temp_dir = split_audio(test_audio_file_path, 700)
-            st.sidebar.write(f"Sample audio split into {parts} parts")
-            test_split_directory = "test_split_directory"
-            os.makedirs(test_split_directory, exist_ok=True)
-            for file in os.listdir(temp_dir.name):
-                shutil.move(os.path.join(temp_dir.name, file), os.path.join(test_split_directory, file))
-            temp_dir.cleanup()
-        except Exception as e:
-            st.sidebar.error(f"Error in split_audio: {e}")
-
-    if test_split_directory is not None and st.sidebar.button("Test transcribe_audio_files"):
-        try:
-            responses = transcribe_audio_files(test_split_directory)
-            st.sidebar.write(f"Received {len(responses)} responses from the transcription API")
-        except Exception as e:
-            st.sidebar.error(f"Error in transcribe_audio_files: {e}")
-
-    if st.sidebar.button("Test transcribe_audio"):
-        try:
-            transcript = transcribe_audio(test_audio_file_path, 700)
-            st.sidebar.write("Transcription result:")
-            st.sidebar.write(transcript)
-        except Exception as e:
-            st.sidebar.error(f"Error in transcribe_audio: {e}")
+    # Add a download link for the prediction file
+    if "prediction_file_path" in st.session_state:
+        st.markdown(f"[Download prediction file](file:///{st.session_state['prediction_file_path']})")
 else:
-    st.sidebar.warning("Please upload an audio file to test the functions.")
-
+    st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
