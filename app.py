@@ -24,14 +24,15 @@ def split_audio(file_path, output_dir, part_duration):
     duration = audio.duration
     parts = int(duration // part_duration)
 
-    for i in range(parts):
+    for i in range(parts + 1):  # Add 1 to include the last part
         start_time = i * part_duration
-        end_time = (i + 1) * part_duration
+        end_time = (i + 1) * part_duration if i < parts else duration  # Use the duration for the last part's end_time
         split_audio = audio.subclip(start_time, end_time)
         split_audio.write_audiofile(os.path.join(output_dir, f"part_{i + 1:03d}.mp3"), codec='mp3')
 
-    print(f"Audio file successfully split into {parts} equal parts and saved in '{output_dir}'.")
-    return parts
+    print(f"Audio file successfully split into {parts + 1} parts and saved in '{output_dir}'.")  # Update the printed message
+    return parts + 1  # Return the total number of parts
+
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(5))
