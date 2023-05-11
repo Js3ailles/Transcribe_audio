@@ -4,8 +4,7 @@ from moviepy.editor import AudioFileClip
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 import streamlit as st  
 import shutil
-
-
+from pydub import AudioSegment
 import os
 import requests
 from moviepy.editor import AudioFileClip
@@ -80,6 +79,13 @@ def transcribe_audio_files(directory, max_workers=5):
 
 
 def transcribe_audio(input_file_path, segment_duration, update_callback=None):
+    # Convert input file to mp3 if it's not mp3
+    file_extension = os.path.splitext(input_file_path)[1]
+    if file_extension.lower() != ".mp3":
+        audio = AudioSegment.from_file(input_file_path, file_extension[1:])
+        input_file_path = os.path.splitext(input_file_path)[0] + ".mp3"
+        audio.export(input_file_path, format="mp3")
+        
     predicted = ''
     temp_dir = Path("temp/splitted")
     temp_dir.mkdir(parents=True, exist_ok=True)
@@ -129,11 +135,11 @@ if uploaded_files:
     selected_audio = st.sidebar.selectbox("Select an audio file to view transcription", list(audio_files.keys()))
 
     if st.button("Transcribe"):
-        try:
-            with st.spinner('Creating this audio transcript'):
-                with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_audio_file:
-                    tmp_audio_file.write(audio_files[selected_audio].getbuffer())
-                    tmp_audio_file.flush()
+       try:
+        with st.spinner('Creating this audio transcript'):
+            with NamedTemporaryFile(delete=False, suffix=f".{audio_files[selected_audio].type.split('/')[1]}") as tmp_audio_file:
+                tmp_audio_file.write(audio_files[selected_audio].getbuffer())
+                tmp_audio_file.flush()
 
                     def update_transcription(transcription):
                         st.session_state[f"transcript_{selected_audio}"] = transcription
