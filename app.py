@@ -124,6 +124,51 @@ def transcribe_audio(input_file_path, segment_duration, file_type, update_callba
 
 st.title("Audio Transcription App")
 
+# Introduction
+st.markdown(
+    """
+    ## Introduction
+
+    Bienvenue sur l'application de transcription audio ! Cette application permet de convertir automatiquement des fichiers audio en texte en utilisant une technologie de reconnaissance vocale avancée.
+    """
+)
+
+# Comment utiliser l'application
+st.markdown(
+    """
+    ## Comment utiliser l'application
+
+    1. Utilisez le bouton "Upload one or multiple audio files" pour télécharger un ou plusieurs fichiers audio de votre choix.
+    2. Sélectionnez un fichier audio dans le menu déroulant situé dans la barre latérale gauche pour afficher la transcription.
+    3. Cliquez sur le bouton "Transcribe" pour lancer le processus de transcription.
+    4. Attendez que la transcription soit terminée et visualisez-la dans la zone de texte.
+    5. Téléchargez le fichier de transcription en cliquant sur le bouton "Download transcription file".
+    """
+)
+
+# Formats de fichiers pris en charge
+st.markdown(
+    """
+    ## Formats de fichiers pris en charge
+
+    Les formats de fichiers audio pris en charge sont les suivants :
+    
+    - MP3
+    - MP4 (la piste audio sera extraite)
+    - WAV
+    """
+)
+
+# À propos du processus de transcription
+st.markdown(
+    """
+    ## À propos du processus de transcription
+
+    L'application utilise une API de transcription pour effectuer la conversion audio en texte. Le fichier audio est divisé en segments plus courts pour accélérer le processus de transcription. Les transcriptions sont ensuite fusionnées pour créer un fichier texte complet. Notez que la qualité de la transcription peut varier en fonction de la clarté de l'audio et des accents des locuteurs.
+    """
+)
+
+
 uploaded_files = st.file_uploader("Upload one or multiple audio files", type=["mp3", "mp4", "wav"], accept_multiple_files=True)
 
 if uploaded_files:
