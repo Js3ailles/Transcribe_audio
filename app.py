@@ -136,10 +136,10 @@ if uploaded_files:
 
     if st.button("Transcribe"):
        try:
-        with st.spinner('Creating this audio transcript'):
-            with NamedTemporaryFile(delete=False, suffix=f".{audio_files[selected_audio].type.split('/')[1]}") as tmp_audio_file:
-                tmp_audio_file.write(audio_files[selected_audio].getbuffer())
-                tmp_audio_file.flush()
+            with st.spinner('Creating this audio transcript'):
+                with NamedTemporaryFile(delete=False, suffix=f".{audio_files[selected_audio].type.split('/')[1]}") as tmp_audio_file:
+                    tmp_audio_file.write(audio_files[selected_audio].getbuffer())
+                    tmp_audio_file.flush()
 
                     def update_transcription(transcription):
                         st.session_state[f"transcript_{selected_audio}"] = transcription
