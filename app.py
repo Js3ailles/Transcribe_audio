@@ -247,6 +247,7 @@ elif choice == "PDF summarizer":
     if file is not None:
         with st.spinner('Processing the PDF file...'):
             text = content(file)  # assuming `content` function extracts text from PDF
+            st.write(text)
 
         if not text:
             st.error("Unable to extract content from the PDF.")
