@@ -241,7 +241,7 @@ elif choice == "PDF summarizer":
     st.write("Upload a PDF file and get a brief summary of it.")
     
     st.sidebar.title("Options")
-    wordlimit = st.sidebar.slider('length of the summary :', 700, 5000, 2000)
+    wordlimit = st.sidebar.slider('length of the summary (in words) :', 700, 5000, 2000)
 
     file = st.sidebar.file_uploader("Upload a PDF", type="pdf")
 
