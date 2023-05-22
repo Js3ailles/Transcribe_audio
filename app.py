@@ -251,7 +251,6 @@ elif choice == "PDF summarizer":
 
             paragraphs = concatenate_short_paragraphs(paragraphs)
             # Reset the cache to avoid errors when re-running the code
-            caching.clear_cache()
             st.success('PDF processed successfully. Now generating summary...')
 
         with st.spinner('Generating the summary...'):
