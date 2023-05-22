@@ -32,7 +32,7 @@ from tenacity import (
 )  # for exponential backoff
 from datetime import date
     
-Model_choice='text-davinci-003'
+Model_choice='gpt-3.5-turbo'
 
 max_tokens=500
 
