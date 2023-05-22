@@ -248,7 +248,6 @@ elif choice == "PDF summarizer":
 
             if not paragraphs:
                 st.error("Unable to extract content from the PDF.")
-            return
 
             paragraphs = concatenate_short_paragraphs(paragraphs)
             # Reset the cache to avoid errors when re-running the code
