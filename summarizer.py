@@ -289,6 +289,7 @@ def finalsummary(lst):
     return concatenated
 
 def summarize_this(text,model=Model_choice,stop_sequence=None):
+  pr="act as an academic researcher, summarize and translate this text in "+str(Language)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
     response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 100 words."},
@@ -300,6 +301,7 @@ def summarize_this(text,model=Model_choice,stop_sequence=None):
 
 
 def summarize_in_english(text,model=Model_choice,stop_sequence=None):
+  pr="act as an academic researcher, summarize and translate this text in "+str(Language)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
     response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 100 words."},
