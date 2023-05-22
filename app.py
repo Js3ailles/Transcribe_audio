@@ -255,7 +255,6 @@ elif choice == "PDF summarizer":
 
         with tab1:
             st.header("Content of the PDF")
-            contenido=st.text_area(label="choice",value="here is the text i want to display")
             st.write(text)
 
         with tab2:
@@ -269,7 +268,7 @@ elif choice == "PDF summarizer":
                 st.success('Summary generated successfully.')
 
             st.subheader("Here is your summary")
-            st.text_area(value=summary)
+            st.text_area(“:blue[here is the summary :]”,summary,height=2000)
     else:
         st.info("Please upload a PDF file to get started.")
 
