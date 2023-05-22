@@ -259,7 +259,7 @@ elif choice == "PDF summarizer":
             st.success('Summary generated successfully.')
 
         st.subheader("Summary")
-        st.textbox(summary)
+        st.text_area(summary)
     else:
         st.info("Please upload a PDF file to get started.")
 
