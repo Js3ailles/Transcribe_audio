@@ -34,7 +34,7 @@ from datetime import date
     
 Model_choice='gpt-3.5-turbo'
 
-max_tokens=2000
+max_tokens=1000
 
 import time
 
@@ -306,7 +306,7 @@ def summarize_this(text,model=Model_choice,stop_sequence=None,Lang="French"):
   pr="act as an academic researcher, summarize and translate this text in "+str(Lang)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
-    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 500 words."},
+    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 400 words."},
         {"role": "user", "content": pr}],max_tokens=max_tokens,temperature=0.9,top_p=1,n=1)
     return response['choices'][0]['message']['content'].strip()
   except Exception as e:
@@ -318,7 +318,7 @@ def summarize_in_english(text,model=Model_choice,stop_sequence=None,Lang="French
   pr="act as an academic researcher, summarize and translate this text in "+str(Lang)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
-    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 500 words."},
+    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 400 words."},
         {"role": "user", "content": pr}],max_tokens=max_tokens,temperature=0.9,top_p=1,n=1)
     return response['choices'][0]['message']['content'].strip()
   except Exception as e:
