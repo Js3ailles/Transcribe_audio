@@ -34,7 +34,7 @@ from datetime import date
     
 Model_choice='gpt-3.5-turbo'
 
-max_tokens=3000
+max_tokens=2000
 
 import time
 
@@ -302,7 +302,7 @@ def finalsummary(lst):
             concatenated += "\n"
     return concatenated
 
-def summarize_this(text,model=Model_choice,stop_sequence=None,Lang="English"):
+def summarize_this(text,model=Model_choice,stop_sequence=None,Lang="French"):
   pr="act as an academic researcher, summarize and translate this text in "+str(Lang)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
@@ -314,7 +314,7 @@ def summarize_this(text,model=Model_choice,stop_sequence=None,Lang="English"):
     return ""
 
 
-def summarize_in_english(text,model=Model_choice,stop_sequence=None,Lang="English"):
+def summarize_in_english(text,model=Model_choice,stop_sequence=None,Lang="French"):
   pr="act as an academic researcher, summarize and translate this text in "+str(Lang)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
