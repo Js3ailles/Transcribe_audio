@@ -247,20 +247,28 @@ elif choice == "PDF summarizer":
     if file is not None:
         with st.spinner('Processing the PDF file...'):
             text = content(file)  # assuming `content` function extracts text from PDF
-            st.write(text)
 
         if not text:
             st.error("Unable to extract content from the PDF.")
+            
+        tab1, tab2 = st.tabs(["PDF content", "PDF summary"])
 
-        # Assuming you want to split the extracted text into paragraphs
-        paragraphs = text.split("\n\n")
+        with tab1:
+            st.header("Content of the PDF")
+            st.write(text)
 
-        with st.spinner('Generating the summary...'):
-            summary = total_summarizer(text,Language)
-            st.success('Summary generated successfully.')
+        with tab2:
+            st.header("PDF summary")
+                       
+            # Assuming you want to split the extracted text into paragraphs
+            paragraphs = text.split("\n\n")
 
-        st.subheader("Summary")
-        st.write(summary)
+            with st.spinner('Generating the summary...'):
+                summary = total_summarizer(text,Language)
+                st.success('Summary generated successfully.')
+
+            st.subheader("Here is your summary")
+            st.text_area(summary)
     else:
         st.info("Please upload a PDF file to get started.")
 
