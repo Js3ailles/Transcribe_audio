@@ -266,9 +266,9 @@ elif choice == "PDF summarizer":
             with st.spinner('Generating the summary...'):
                 summary = total_summarizer(text,Language)
                 st.success('Summary generated successfully.')
-
+            
             st.subheader("Here is your summary")
-            st.text_area("summa”,str(summary))
+            st.text_area("summa",str(summary))
     else:
         st.info("Please upload a PDF file to get started.")
 
