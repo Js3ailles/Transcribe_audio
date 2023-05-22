@@ -285,10 +285,10 @@ def total_summarizer(text, lang, wordl=2000,model=Model_choice):
 
   # Call summarize_in_english function in parallel on each chunk
   with concurrent.futures.ThreadPoolExecutor() as executor:
-    summaries = list(executor.map(lambda chunk: summarize_in_english(chunk, model, lang), fs_chunks))
+    summaries = list(executor.map(lambda chunk: summarize_in_english(chunk, model, Lang=lang), fs_chunks))
 
   # Concatenate these summaries to create the final summary
-  final_summary = ' '.join(summaries)
+  final_summary = '\n\n '.join(summaries)
 
   return final_summary
 
