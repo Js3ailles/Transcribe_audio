@@ -255,6 +255,7 @@ elif choice == "PDF summarizer":
 
         with tab1:
             st.header("Content of the PDF")
+            contenido=st.text_area(label="choice",value="here is the text i want to display")
             st.write(text)
 
         with tab2:
