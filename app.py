@@ -256,7 +256,7 @@ elif choice == "PDF summarizer":
         paragraphs = text.split("\n\n")
 
         with st.spinner('Generating the summary...'):
-            summary = total_summarizer(text)
+            summary = total_summarizer(text,Language)
             st.success('Summary generated successfully.')
 
         st.subheader("Summary")
