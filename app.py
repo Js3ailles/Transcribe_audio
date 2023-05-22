@@ -241,6 +241,7 @@ elif choice == "PDF summarizer":
     st.write("Upload a PDF file and get a brief summary of it.")
     
     st.sidebar.title("Options")
+    wordlimit = st.slider('length of the summary :', 700, 5000, 2000)
 
     file = st.sidebar.file_uploader("Upload a PDF", type="pdf")
 
@@ -264,7 +265,7 @@ elif choice == "PDF summarizer":
             paragraphs = text.split("\n\n")
 
             with st.spinner('Generating the summary...'):
-                summary = total_summarizer(text,Language)
+                summary = total_summarizer(text,Language,wordl=wordlimit)
                 st.success('Summary generated successfully.')
             
             st.subheader("Here is your summary")
