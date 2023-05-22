@@ -235,6 +235,8 @@ elif choice == "PDF summarizer":
     if CLEAR:
         st.cache_data.clear()
     
+    
+
     st.title("PDF Summarizer")
     st.write("Upload a PDF file and get a brief summary of it.")
     
@@ -244,17 +246,15 @@ elif choice == "PDF summarizer":
 
     if file is not None:
         with st.spinner('Processing the PDF file...'):
-            paragraphs = get_paragraphs(file)
+            text = content(file)  # assuming `content` function extracts text from PDF
 
-            if not paragraphs:
-                st.error("Unable to extract content from the PDF.")
+        if not text:
+            st.error("Unable to extract content from the PDF.")
 
-            paragraphs = concatenate_short_paragraphs(paragraphs)
-            # Reset the cache to avoid errors when re-running the code
-            st.success('PDF processed successfully. Now generating summary...')
+        # Assuming you want to split the extracted text into paragraphs
+        paragraphs = text.split("\n\n")
 
         with st.spinner('Generating the summary...'):
-            text = " ".join(paragraphs)
             summary = total_summarizer(text)
             st.success('Summary generated successfully.')
 
