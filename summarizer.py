@@ -276,7 +276,7 @@ def total_summarizer(text,lang):
       L2 = list(executor.map(summarize_this, L2))
     total_words = sum(len(paragraph.split()) for paragraph in L2)
   fs = finalsummary(L2)
-  fs=summarize_in_english(fs,Language=lang)
+  fs=summarize_in_english(fs,Lang=lang)
   return fs
 
   
