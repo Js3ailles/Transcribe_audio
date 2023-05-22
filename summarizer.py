@@ -34,7 +34,7 @@ from datetime import date
     
 Model_choice='gpt-3.5-turbo'
 
-max_tokens=1500
+max_tokens=3000
 
 import time
 
