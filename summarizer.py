@@ -189,9 +189,9 @@ def split_text_into_chunks(text):
         # Add the number of words in the current sentence to the total word count
         word_count += sentence_word_count
 
-        # If the word count is greater than or equal to 500, add the current chunk to the list of chunks
+        # If the word count is greater than or equal to 1500, add the current chunk to the list of chunks
         # and reset the current chunk and word count
-        if word_count >= 500:
+        if word_count >= 250:
             chunks.append(clean_text(current_chunk))
             current_chunk = ""
             word_count = 0
@@ -251,7 +251,7 @@ def concat_paragraphs(paragraphs):
         list of str: The concatenated paragraphs.
     """
     total_words = sum(len(paragraph.split()) for paragraph in paragraphs)
-    if total_words > 500:
+    if total_words > 1200:
         concatenated_paragraphs = []
         for i in range(0, len(paragraphs), 2):
             if i+1 < len(paragraphs):
@@ -270,13 +270,13 @@ def total_summarizer(text):
   with concurrent.futures.ThreadPoolExecutor() as executor:
     L2 = list(executor.map(summarize_this, L1))
   total_words = sum(len(paragraph.split()) for paragraph in L2)
-  while total_words > 2000:
+  while total_words > 1200:
     L2 = concat_paragraphs(L2)
     with concurrent.futures.ThreadPoolExecutor() as executor:
       L2 = list(executor.map(summarize_this, L2))
     total_words = sum(len(paragraph.split()) for paragraph in L2)
   fs = finalsummary(L2)
-  fs=summarize_this(fs)
+  fs=summarize_in_english(fs)
   return fs
 
   
@@ -288,11 +288,11 @@ def finalsummary(lst):
             concatenated += "\n"
     return concatenated
 
-
 def summarize_this(text,model=Model_choice,stop_sequence=None):
+  pr="summarize this text:  '" +str(text)+"' in 100 words "
   try:
     # Create a completions using the question and context
-    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 200 words."},
+    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 100 words."},
         {"role": "user", "content": pr}],max_tokens=500,temperature=0.9,top_p=1,n=1)
     return response['choices'][0]['message']['content'].strip()
   except Exception as e:
@@ -301,9 +301,10 @@ def summarize_this(text,model=Model_choice,stop_sequence=None):
 
 
 def summarize_in_english(text,model=Model_choice,stop_sequence=None):
+  pr="act as an academic researcher, summarize and translate this text in "+str(Language)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
-    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 200 words."},
+    response = openai.ChatCompletion.create(model=Model_choice,messages=[{"role": "system", "content": "You are an ai assistant that act as a summarizer, summarize the text provided by the user in 100 words."},
         {"role": "user", "content": pr}],max_tokens=500,temperature=0.9,top_p=1,n=1)
     return response['choices'][0]['message']['content'].strip()
   except Exception as e:
