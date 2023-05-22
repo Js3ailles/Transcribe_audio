@@ -224,7 +224,7 @@ if choice == "Audio Transcription":
             st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
 
 elif choice == "PDF summarizer":
-    Language = st.sidebar.selectbox("Choose the output language for summary", [ "English","French", "German"])
+    Language = st.sidebar.selectbox("Choose the output language for summary", [ "French", "English", "German"])
     api_key = st.sidebar.text_input("OpenAI API KEY")
     if api_key is not None:
         openai.api_key = api_key
