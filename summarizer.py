@@ -189,9 +189,9 @@ def split_text_into_chunks(text):
         # Add the number of words in the current sentence to the total word count
         word_count += sentence_word_count
 
-        # If the word count is greater than or equal to 700, add the current chunk to the list of chunks
+        # If the word count is greater than or equal to 500, add the current chunk to the list of chunks
         # and reset the current chunk and word count
-        if word_count >= 700:
+        if word_count >= 500:
             chunks.append(clean_text(current_chunk))
             current_chunk = ""
             word_count = 0
@@ -229,7 +229,7 @@ def split_text_into_chunks_for_summary(text):
 
         # If the word count is greater than or equal to 1500, add the current chunk to the list of chunks
         # and reset the current chunk and word count
-        if word_count >= 700:
+        if word_count >= 500:
             chunks.append(clean_text(current_chunk))
             current_chunk = ""
             word_count = 0
@@ -251,7 +251,7 @@ def concat_paragraphs(paragraphs):
         list of str: The concatenated paragraphs.
     """
     total_words = sum(len(paragraph.split()) for paragraph in paragraphs)
-    if total_words > 1200:
+    if total_words > 500:
         concatenated_paragraphs = []
         for i in range(0, len(paragraphs), 2):
             if i+1 < len(paragraphs):
