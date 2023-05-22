@@ -265,12 +265,12 @@ def concat_paragraphs(paragraphs):
 import concurrent.futures
 
 @st.cache_data
-def total_summarizer(text, lang, model=Model_choice):
+def total_summarizer(text, lang, wordl=2000,model=Model_choice):
   L1 = split_text_into_chunks_for_summary(text)
   with concurrent.futures.ThreadPoolExecutor() as executor:
     L2 = list(executor.map(summarize_this, L1))
   total_words = sum(len(paragraph.split()) for paragraph in L2)
-  while total_words > 3000:
+  while total_words > wordl:
     L2 = concat_paragraphs(L2)
     with concurrent.futures.ThreadPoolExecutor() as executor:
       L2 = list(executor.map(summarize_this, L2))
