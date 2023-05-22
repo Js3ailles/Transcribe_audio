@@ -191,7 +191,7 @@ def split_text_into_chunks(text):
 
         # If the word count is greater than or equal to 1500, add the current chunk to the list of chunks
         # and reset the current chunk and word count
-        if word_count >= 250:
+        if word_count >= 700:
             chunks.append(clean_text(current_chunk))
             current_chunk = ""
             word_count = 0
@@ -229,7 +229,7 @@ def split_text_into_chunks_for_summary(text):
 
         # If the word count is greater than or equal to 1500, add the current chunk to the list of chunks
         # and reset the current chunk and word count
-        if word_count >= 500:
+        if word_count >= 700:
             chunks.append(clean_text(current_chunk))
             current_chunk = ""
             word_count = 0
@@ -270,7 +270,7 @@ def total_summarizer(text,lang):
   with concurrent.futures.ThreadPoolExecutor() as executor:
     L2 = list(executor.map(summarize_this, L1))
   total_words = sum(len(paragraph.split()) for paragraph in L2)
-  while total_words > 1200:
+  while total_words > 3000:
     L2 = concat_paragraphs(L2)
     with concurrent.futures.ThreadPoolExecutor() as executor:
       L2 = list(executor.map(summarize_this, L2))
