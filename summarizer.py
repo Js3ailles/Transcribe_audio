@@ -286,7 +286,7 @@ def finalsummary(lst):
         concatenated += lst[i]
         if i != len(lst) - 1:
             concatenated += "\n"
-    return final_summary
+    return concatenated
 
 
 def summarize_this(text,model=Model_choice,stop_sequence=None):
