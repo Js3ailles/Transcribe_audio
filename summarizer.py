@@ -265,7 +265,7 @@ def concat_paragraphs(paragraphs):
 import concurrent.futures
 
 @st.cache_data
-def total_summarizer(text):
+def total_summarizer(text,lang):
   L1 = split_text_into_chunks_for_summary(text)
   with concurrent.futures.ThreadPoolExecutor() as executor:
     L2 = list(executor.map(summarize_this, L1))
@@ -276,7 +276,7 @@ def total_summarizer(text):
       L2 = list(executor.map(summarize_this, L2))
     total_words = sum(len(paragraph.split()) for paragraph in L2)
   fs = finalsummary(L2)
-  fs=summarize_in_english(fs)
+  fs=summarize_in_english(fs,Language=lang)
   return fs
 
   
@@ -288,7 +288,7 @@ def finalsummary(lst):
             concatenated += "\n"
     return concatenated
 
-def summarize_this(text,model=Model_choice,stop_sequence=None):
+def summarize_this(text,model=Model_choice,stop_sequence=None,Language="English"):
   pr="act as an academic researcher, summarize and translate this text in "+str(Language)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
@@ -300,7 +300,7 @@ def summarize_this(text,model=Model_choice,stop_sequence=None):
     return ""
 
 
-def summarize_in_english(text,model=Model_choice,stop_sequence=None):
+def summarize_in_english(text,model=Model_choice,stop_sequence=None,Langugage="English"):
   pr="act as an academic researcher, summarize and translate this text in "+str(Language)+":  '" +str(text)+"' "
   try:
     # Create a completions using the question and context
