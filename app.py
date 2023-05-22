@@ -241,9 +241,10 @@ elif choice == "PDF summarizer":
     st.write("Upload a PDF file and get a brief summary of it.")
     
     st.sidebar.title("Options")
-    wordlimit = st.sidebar.slider('length of the summary (in words) :', 700, 5000, 2000)
+    wordlimit = st.sidebar.slider('length of the summary (in characters) :', 700, 5000, 2000)
 
     file = st.sidebar.file_uploader("Upload a PDF", type="pdf")
+    generate_summary = st.sidebar.button("Generate Summary")  # Button to trigger the computation of the summary
 
     if file is not None:
         with st.spinner('Processing the PDF file...'):
@@ -264,12 +265,13 @@ elif choice == "PDF summarizer":
             # Assuming you want to split the extracted text into paragraphs
             paragraphs = text.split("\n\n")
 
-            with st.spinner('Generating the summary...'):
-                summary = total_summarizer(text,Language,wordl=wordlimit)
-                st.success('Summary generated successfully.')
+            if generate_summary:
+                with st.spinner('Generating the summary...'):
+                    summary = total_summarizer(text,Language,wordl=wordlimit)
+                    st.success('Summary generated successfully.')
             
-            st.subheader("Here is your summary")
-            st.text_area("summa",str(summary),height=600)
+                st.subheader("Here is your summary")
+                st.text_area("summa",str(summary),height=600)
     else:
         st.info("Please upload a PDF file to get started.")
 
