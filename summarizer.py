@@ -276,7 +276,6 @@ def total_summarizer(text):
       L2 = list(executor.map(summarize_this, L2))
     total_words = sum(len(paragraph.split()) for paragraph in L2)
   fs = finalsummary(L2)
-  fs=summarize_in_english(fs)
   return fs
 
   
@@ -286,7 +285,16 @@ def finalsummary(lst):
         concatenated += lst[i]
         if i != len(lst) - 1:
             concatenated += "\n"
-    return concatenated
+    splitted_text = concatenated.split(". ")
+    final_summary = ""
+    chunk_size = 1000
+    for i in range(0, len(splitted_text), chunk_size):
+        chunk = ". ".join(splitted_text[i:i+chunk_size])
+        chunk_summary = summarize_in_english(chunk)
+        final_summary += chunk_summary
+        final_summary += " "
+    return final_summary
+
 
 def summarize_this(text,model=Model_choice,stop_sequence=None):
   pr="summarize this text:  '" +str(text)+"' in 100 words "
