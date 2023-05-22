@@ -256,7 +256,6 @@ elif choice == "PDF summarizer":
         with st.spinner('Generating the summary...'):
             text = " ".join(paragraphs)
             summary = total_summarizer(text)
-            caching.clear_cache()
             st.success('Summary generated successfully.')
 
         st.subheader("Summary")
