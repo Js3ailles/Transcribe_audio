@@ -265,7 +265,7 @@ def concat_paragraphs(paragraphs):
 import concurrent.futures
 
 @st.cache_data
-def total_summarizer(text,lang):
+def total_summarizer(text, lang, model=Model_choice):
   L1 = split_text_into_chunks_for_summary(text)
   with concurrent.futures.ThreadPoolExecutor() as executor:
     L2 = list(executor.map(summarize_this, L1))
@@ -276,8 +276,22 @@ def total_summarizer(text,lang):
       L2 = list(executor.map(summarize_this, L2))
     total_words = sum(len(paragraph.split()) for paragraph in L2)
   fs = finalsummary(L2)
-  fs=summarize_in_english(fs,Lang=lang)
-  return fs
+
+  # Break fs into chunks of 1000 words
+  fs_chunks = []
+  words = fs.split()
+  for i in range(0, len(words), 1000):
+    fs_chunks.append(' '.join(words[i:i+1000]))
+
+  # Call summarize_in_english function in parallel on each chunk
+  with concurrent.futures.ThreadPoolExecutor() as executor:
+    summaries = list(executor.map(lambda chunk: summarize_in_english(chunk, model, lang), fs_chunks))
+
+  # Concatenate these summaries to create the final summary
+  final_summary = ' '.join(summaries)
+
+  return final_summary
+
 
   
 def finalsummary(lst):
