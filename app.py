@@ -237,8 +237,10 @@ if choice == "Audio Transcription":
         )
                         if generate_summary2:
                             with st.spinner('Generating the summary of the recording...'):
-                                summary = total_summarizer(st.session_state[f"transcript_{selected_audio}"],Language2,wordl=wordlimit2)
+                                summary2 = total_summarizer(st.session_state[f"transcript_{selected_audio}"],Language2,wordl=wordlimit2)
                                 st.success('Summary generated successfully.')
+                            sub_transc=st.subheader("Here is your summary")
+                            summary_transcp=st.text_area("summa",str(summary2),height=600)
 
         else:
             st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
