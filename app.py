@@ -134,6 +134,22 @@ choice = st.sidebar.radio("Go to", features)
 
 if choice == "Audio Transcription":
     st.title("Audio Transcription App")
+    Language2 = st.sidebar.selectbox("Choose the output language for summary", [ "French", "English", "German"])
+    api_key2 = st.sidebar.text_input("OpenAI API KEY")
+    if api_key2 is not None:
+        openai.api_key = api_key2
+    Modchoice2= st.sidebar.selectbox("Choose the OpenAI model",["gpt-3.5-turbo","gpt-4","gpt-4-32k"])
+    if Modchoice2 is not None:
+        Model_choice=Modchoice2
+    CLEAR2=st.sidebar.button("Clear cache")
+    if CLEAR2:
+        st.cache_data.clear()
+   
+    
+    st.sidebar.title("Summarizer Options")
+    wordlimit2 = st.sidebar.slider('length of the summary (in characters) :', 700, 5000, 2000)
+    generate_summary2 = st.sidebar.button("Generate Summary")  # Button to trigger the computation of the summary
+
 
     # Introduction
     st.markdown(
@@ -219,6 +235,10 @@ if choice == "Audio Transcription":
             file_name=f"transcription_{selected_audio}.txt",
             mime="text/plain"
         )
+                        if generate_summary2:
+                            with st.spinner('Generating the summary of the recording...'):
+                                summary = total_summarizer(st.session_state[f"transcript_{selected_audio}"],Language2,wordl=wordlimit2)
+                                st.success('Summary generated successfully.')
 
         else:
             st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
