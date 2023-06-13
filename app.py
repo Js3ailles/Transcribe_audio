@@ -130,20 +130,23 @@ st.sidebar.title("Navigation")
 # Add the features that your application provides
 features = [ "PDF summarizer","Audio Transcription"]
 choice = st.sidebar.radio("Go to", features)
+Language = st.sidebar.selectbox("Choose the output language for summary", [ "French", "English", "German"])
+api_key = st.sidebar.text_input("OpenAI API KEY")
+if api_key is not None:
+    openai.api_key = api_key
+Modchoice= st.sidebar.selectbox("Choose the OpenAI model",["gpt-3.5-turbo","gpt-4","gpt-4-32k"])
+if Modchoice is not None:
+    Model_choice=Modchoice
+CLEAR=st.sidebar.button("Clear cache")
+if CLEAR:
+    st.cache_data.clear()
 
 
 if choice == "Audio Transcription":
     st.title("Audio Transcription App")
-    Language = st.sidebar.selectbox("Choose the output language for summary", [ "French", "English", "German"])
-    api_key = st.sidebar.text_input("OpenAI API KEY")
-    if api_key is not None:
-        openai.api_key = api_key
-    Modchoice= st.sidebar.selectbox("Choose the OpenAI model",["gpt-3.5-turbo","gpt-4","gpt-4-32k"])
-    if Modchoice is not None:
-        Model_choice=Modchoice
-    CLEAR=st.sidebar.button("Clear cache")
-    if CLEAR:
-        st.cache_data.clear()
+    st.sidebar.title("Options")
+    wordlimit1 = st.sidebar.slider('length of the summary (in characters) :', 700, 5000, 2000)
+    generate_summary1 = st.sidebar.button("Generate Summary of the transcript")  # Button to trigger the computation of the summary
 
     # Introduction
     st.markdown(
@@ -229,9 +232,9 @@ if choice == "Audio Transcription":
             file_name=f"transcription_{selected_audio}.txt",
             mime="text/plain"
         )
-                if generate_summary:
+                if generate_summary1:
                     with st.spinner('Generating the summary...'):
-                        summary = total_summarizer(text,Language,wordl=wordlimit)
+                        summary = total_summarizer(text,Language,wordl=wordlimit1)
                         st.success('Summary generated successfully.')
             
                     st.subheader("Here is your summary")
@@ -240,18 +243,7 @@ if choice == "Audio Transcription":
         else:
             st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
 
-elif choice == "PDF summarizer":
-    Language = st.sidebar.selectbox("Choose the output language for summary", [ "French", "English", "German"])
-    api_key = st.sidebar.text_input("OpenAI API KEY")
-    if api_key is not None:
-        openai.api_key = api_key
-    Modchoice= st.sidebar.selectbox("Choose the OpenAI model",["gpt-3.5-turbo","gpt-4","gpt-4-32k"])
-    if Modchoice is not None:
-        Model_choice=Modchoice
-    CLEAR=st.sidebar.button("Clear cache")
-    if CLEAR:
-        st.cache_data.clear()
-    
+elif choice == "PDF summarizer":    
     
 
     st.title("PDF Summarizer")
