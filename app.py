@@ -134,6 +134,16 @@ choice = st.sidebar.radio("Go to", features)
 
 if choice == "Audio Transcription":
     st.title("Audio Transcription App")
+    Language = st.sidebar.selectbox("Choose the output language for summary", [ "French", "English", "German"])
+    api_key = st.sidebar.text_input("OpenAI API KEY")
+    if api_key is not None:
+        openai.api_key = api_key
+    Modchoice= st.sidebar.selectbox("Choose the OpenAI model",["gpt-3.5-turbo","gpt-4","gpt-4-32k"])
+    if Modchoice is not None:
+        Model_choice=Modchoice
+    CLEAR=st.sidebar.button("Clear cache")
+    if CLEAR:
+        st.cache_data.clear()
 
     # Introduction
     st.markdown(
@@ -219,6 +229,13 @@ if choice == "Audio Transcription":
             file_name=f"transcription_{selected_audio}.txt",
             mime="text/plain"
         )
+                if generate_summary:
+                    with st.spinner('Generating the summary...'):
+                        summary = total_summarizer(text,Language,wordl=wordlimit)
+                        st.success('Summary generated successfully.')
+            
+                    st.subheader("Here is your summary")
+                    st.text_area("Complete summary",str(summary),height=600)
 
         else:
             st.text_area("Transcription", value="Here will be printed the transcription as soon as it is finished.", height=400)
@@ -271,7 +288,7 @@ elif choice == "PDF summarizer":
                     st.success('Summary generated successfully.')
             
                 st.subheader("Here is your summary")
-                st.text_area("summa",str(summary),height=600)
+                st.text_area("Complete summary",str(summary),height=600)
     else:
         st.info("Please upload a PDF file to get started.")
 
